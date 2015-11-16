@@ -12,5 +12,17 @@ def config():
       }
     return config
 
+base = 'https://demo-api.ig.com/gateway/deal'
+
+c = config()
+payload={"identifier": c["username"], "password": c["password"]}
+headers = {
+  "Content-Type": "application/json; charset=UTF-8",
+  "Accept": "application/json; charset=UTF-8",
+  "X-IG-API-KEY": c["api_key"]
+  }
+
+
 def do1():
-    url = 'https://demo-api.ig.com/gateway/deal/session'
+    url = base + '/session'
+    return requests.post(url, headers=headers, json=payload)
