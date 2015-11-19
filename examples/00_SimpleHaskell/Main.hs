@@ -1,4 +1,4 @@
--- {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 import Network.Wreq
 import Control.Lens
@@ -22,9 +22,13 @@ run username =
         toJSON
           [ "identifier" =: username
           ]
-      -- opts = defaults & header "Accept" .~ ["*/*"]
+  -- "Content-Type": "application/json; charset=UTF-8",
+  -- "Accept": "application/json; charset=UTF-8",
+  -- "X-IG-API-KEY": c["api_key"]
+      apiKey = "foo" -- BS
+      opts = defaults & header "X-IG-API-KEY".~ [apiKey]
   in
-  do r <- post (base ++ "/session")
+  do r <- postWith opts (base ++ "/session")
           -- ["identifier" := username]
           json
      print r
