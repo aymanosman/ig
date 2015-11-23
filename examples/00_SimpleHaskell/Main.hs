@@ -1,10 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import Network.Wreq
 import Control.Lens
 import Data.Aeson (toJSON)
+import Network.Wreq
 import Data.Aeson.Lens (key, nth)
 import System.Environment
+import Data.ByteString.Char8 as BS
 
 
 base :: String
@@ -15,22 +16,29 @@ base = "https://demo-api.ig.com/gateway/deal"
 (=:) = (,)
 
 
-run :: String -> IO ()
-run username =
+run
+  :: String -- username
+  -> String -- password
+  -> BS.ByteString -- api key
+  -> IO ()
+
+
+
+run username password apiKey =
   let -- json :: Value
-      json =
+      jsonPayload =
         toJSON
           [ "identifier" =: username
+          , "passpord" =: password
           ]
   -- "Content-Type": "application/json; charset=UTF-8",
   -- "Accept": "application/json; charset=UTF-8",
-  -- "X-IG-API-KEY": c["api_key"]
-      apiKey = "foo" -- BS
-      opts = defaults & header "X-IG-API-KEY".~ [apiKey]
+      opts = defaults
+        & header "X-IG-API-KEY".~ [apiKey]
+        & header "Accept" .~ ["application/json", "charset=UTF-8"]
   in
   do r <- postWith opts (base ++ "/session")
-          -- ["identifier" := username]
-          json
+          jsonPayload
      print r
      return ()
 
@@ -40,7 +48,9 @@ main =
   do args <- getArgs
      case args of
        [username] ->
-         do _ <- run username
+         let apiKey = "foo" -- BS
+         in
+         do _ <- run username "secret" apiKey
             return ()
        _ ->
          fail "Usage: main USERNAME"
