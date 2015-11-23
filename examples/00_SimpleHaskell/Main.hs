@@ -1,8 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Exception (catch)
-import Control.Lens
-import Data.Aeson (toJSON)
+import Control.Lens hiding ((.=))
+import Data.Aeson (toJSON, (.=), object)
 import Network.Wreq
 import Data.Aeson.Lens (key, nth)
 import System.Environment
@@ -33,16 +33,17 @@ test u p k =
 
 
 mkPayload u p =
-  toJSON
-    [ "identifier" =: u
-    , "password" =: p
+  object
+    [ "identifier" .= u
+    , "password" .= p
     ]
 
 mkOpts apiKey =
   defaults
     & header "X-IG-API-KEY".~ [apiKey]
-    -- & header "Content-Type" .~ ["application/json", "charset=UTF-8"]
-    -- & header "Accept" .~ ["application/json", "charset=UTF-8"]
+    & header "Content-Type" .~ ["application/json; charset=UTF-8"]
+    & header "Accept" .~ ["application/json; charset=UTF-8"]
+    -- & header "Version" .~ ["2"]
 
 run username password apiKey =
   do r <- postWith (mkOpts apiKey) (base ++ "/session")
