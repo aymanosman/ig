@@ -6,6 +6,7 @@ import Network.Wreq
 import Data.Aeson.Lens (key, nth)
 import System.Environment
 import Data.ByteString.Char8 as BS
+import Data.ByteString.Lazy.Char8 as LBS
 
 
 base :: String
@@ -22,24 +23,28 @@ run
   -> BS.ByteString -- api key
   -> IO ()
 
+test u p k =
+  postWith (mkOpts k) "http://httpbin.org/post"
+  (mkPayload u p)
+  >>=
+  (\r -> LBS.putStrLn (r^.responseBody))
 
+
+mkPayload u p =
+  toJSON
+    [ "identifier" =: u
+    , "password" =: p
+    ]
+
+mkOpts apiKey =
+  defaults
+    & header "X-IG-API-KEY".~ [apiKey]
+    & header "Content-Type" .~ ["application/json", "charset=UTF-8"]
+    & header "Accept" .~ ["application/json", "charset=UTF-8"]
 
 run username password apiKey =
-  let -- json :: Value
-      jsonPayload =
-        toJSON
-          [ "identifier" =: username
-          , "passpord" =: password
-          ]
-  -- "Content-Type": "application/json; charset=UTF-8",
-  -- "Accept": "application/json; charset=UTF-8",
-      opts = defaults
-        & header "X-IG-API-KEY".~ [apiKey]
-        & header "Content-Type" .~ ["application/json", "charset=UTF-8"]
-        & header "Accept" .~ ["application/json", "charset=UTF-8"]
-  in
-  do r <- postWith opts (base ++ "/session")
-          jsonPayload
+  do r <- postWith (mkOpts apiKey) (base ++ "/session")
+          $ mkPayload username password
      print r
      return ()
 
