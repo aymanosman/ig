@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Control.Exception (catch)
 import Control.Lens
 import Data.Aeson (toJSON)
 import Network.Wreq
@@ -7,6 +8,7 @@ import Data.Aeson.Lens (key, nth)
 import System.Environment
 import Data.ByteString.Char8 as BS
 import Data.ByteString.Lazy.Char8 as LBS
+import qualified Network.HTTP.Client as HTTP
 
 
 base :: String
@@ -40,7 +42,7 @@ mkOpts apiKey =
   defaults
     & header "X-IG-API-KEY".~ [apiKey]
     -- & header "Content-Type" .~ ["application/json", "charset=UTF-8"]
-    & header "Accept" .~ ["application/json", "charset=UTF-8"]
+    -- & header "Accept" .~ ["application/json", "charset=UTF-8"]
 
 run username password apiKey =
   do r <- postWith (mkOpts apiKey) (base ++ "/session")
@@ -48,6 +50,9 @@ run username password apiKey =
      print r
      return ()
 
+handler e@(HTTP.StatusCodeException status respHeaders cookieJar) =
+  do print status
+     print respHeaders
 
 main :: IO ()
 main =
