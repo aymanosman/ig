@@ -39,7 +39,7 @@ mkPayload u p =
 mkOpts apiKey =
   defaults
     & header "X-IG-API-KEY".~ [apiKey]
-    & header "Content-Type" .~ ["application/json", "charset=UTF-8"]
+    -- & header "Content-Type" .~ ["application/json", "charset=UTF-8"]
     & header "Accept" .~ ["application/json", "charset=UTF-8"]
 
 run username password apiKey =
