@@ -35,6 +35,7 @@ run username password apiKey =
   -- "Accept": "application/json; charset=UTF-8",
       opts = defaults
         & header "X-IG-API-KEY".~ [apiKey]
+        & header "Content-Type" .~ ["application/json", "charset=UTF-8"]
         & header "Accept" .~ ["application/json", "charset=UTF-8"]
   in
   do r <- postWith opts (base ++ "/session")
