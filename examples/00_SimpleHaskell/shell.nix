@@ -4,14 +4,14 @@ let
 
   inherit (nixpkgs) pkgs;
 
-  f = { mkDerivation, aeson, base, lens, stdenv, wreq }:
+  f = { mkDerivation, aeson, base, ini, lens, stdenv, wreq }:
       mkDerivation {
         pname = "x00-SimpleHaskell";
         version = "0.1.0.0";
         src = ./.;
         isLibrary = false;
         isExecutable = true;
-        executableHaskellDepends = [ aeson base lens wreq ];
+        executableHaskellDepends = [ aeson base ini lens wreq ];
         license = stdenv.lib.licenses.unfree;
       };
 

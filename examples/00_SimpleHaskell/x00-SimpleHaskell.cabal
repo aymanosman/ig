@@ -23,5 +23,6 @@ executable x00-SimpleHaskell
     , wreq
     , lens
     , aeson
+    , ini
   -- hs-source-dirs:
   default-language:    Haskell2010
