@@ -6,7 +6,7 @@ version:             0.1.0.0
 -- synopsis:
 -- description:
 -- license:
-license-file:        LICENSE
+-- license-file:        LICENSE
 author:              Ayman Osman
 maintainer:          aymano.osman@gmail.com
 -- copyright:
@@ -20,9 +20,13 @@ executable x00-SimpleHaskell
   -- other-modules:
   other-extensions:    OverloadedStrings
   build-depends:       base >=4.8 && <4.9
-    , wreq
-    , lens
-    , aeson
-    , ini
+                     , wreq
+                     , lens
+                     , aeson
+                     , lens-aeson
+                     , ini
+                     , text
+                     , http-client
+                     , bytestring
   -- hs-source-dirs:
   default-language:    Haskell2010
