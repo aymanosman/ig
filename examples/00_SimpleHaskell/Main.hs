@@ -2,7 +2,7 @@
 import Control.Exception (catch)
 import Control.Monad ((<=<))
 import Control.Lens hiding ((.=))
-import Data.Aeson (toJSON, (.=), object)
+import Data.Aeson (toJSON, (.=), object, Value)
 import Network.Wreq
 import Data.Aeson.Lens (key, nth)
 import System.Environment
@@ -19,38 +19,6 @@ base :: String
 base = "https://demo-api.ig.com/gateway/deal"
 
 
--- return Creds (username, password, api key)
-getCreds filename =
-  either
-    fail
-    getCredsFromIni
-    =<<
-    Ini.readIniFile filename
-
-
-getCredsFromIni ini =
-  let mp = lookup' "password" ini
-      mu = lookup' "username" ini
-      mk = lookup' "api_key" ini
-  in
-  if List.all isJust [mu, mp, mk] then
-    return $ Just
-      ( fromJust mu
-      , fromJust mp
-      , fromJust  mk
-      )
-  else
-    return Nothing
-
-
-lookup' key ini =
-  case Ini.lookupValue "default" key ini of
-    Right p ->
-      Just (Text.unpack p)
-    _ ->
-      Nothing
-
-
 (=:) :: String -> String -> (String, String)
 (=:) = (,)
 
@@ -61,13 +29,14 @@ run
   -> String -- api key
   -> IO ()
 
-test u p k =
-  postWith (mkOpts k) "http://httpbin.org/post"
-  (mkPayload u p)
+test1 =
+  postWith (mkOpts "api-key-123") "http://httpbin.org/post"
+  (mkPayload "username-123" "password-123")
   >>=
   (\r -> LBS.putStrLn (r^.responseBody))
 
 
+mkPayload :: String -> String -> Value
 mkPayload u p =
   object
     [ "identifier" .= u
@@ -114,3 +83,35 @@ main =
 
        _ ->
          fail "Usage: main anyfoofornow"
+
+
+-- return Creds (username, password, api key)
+getCreds filename =
+  either
+    fail
+    getCredsFromIni
+    =<<
+    Ini.readIniFile filename
+
+
+getCredsFromIni ini =
+  let mp = lookup' "password" ini
+      mu = lookup' "username" ini
+      mk = lookup' "api_key" ini
+  in
+  if List.all isJust [mu, mp, mk] then
+    return $ Just
+      ( fromJust mu
+      , fromJust mp
+      , fromJust  mk
+      )
+  else
+    return Nothing
+
+
+lookup' key ini =
+  case Ini.lookupValue "default" key ini of
+    Right p ->
+      Just (Text.unpack p)
+    _ ->
+      Nothing
